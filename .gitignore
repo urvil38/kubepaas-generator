@@ -1,0 +1,5 @@
+kubernetes/
+kubepaas/
+kubepaas.yml
+*.DS_Store
+*.pyc
