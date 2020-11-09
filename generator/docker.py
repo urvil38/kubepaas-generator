@@ -6,10 +6,11 @@ class DockerFileBuilder:
     runtimes = {
         "nodejs" : "node:13-alpine",
         "golang113" : "golang:1.13-alpine",
-        "python2" : "python:2.7-alpine",
+        "python2" : "python:2.7",
+        "python3": "python:3.7",
         "static": "nginx:1.17-alpine"
     }
-    supported_runtime = ["nodejs","golang113","python2","static"]
+    supported_runtime = ["nodejs","golang113","python2","python3","static"]
     def __init__(self,config):
         self.runtime = config.get('runtime')
         self.port = config.get('port')

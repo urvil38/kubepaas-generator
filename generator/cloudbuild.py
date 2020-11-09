@@ -2,35 +2,30 @@ from jinja2 import Template
 
 
 class Cloudbuilder:
-    BUCKET_NAME = "kubepaas-ml"
     CLOUDBUILD_TEMPLATE_PATH = "./templates/cloudbuild/"
-    GCP_PROJECT = "kubepaas-261611"
-    LOG_BUCKET = "kubepaas-cloudbuild-logs-bucket"
-    COMPUTE_ZONE = "asia-southeast1-b"
-    CLUSTER_NAME = "kubepaas"
 
-    def __init__(self, config):
-        self.user_project_name = config["project_name"]
-        self.current_version = config["current_version"]
+    def __init__(self, config, cluster_config):
+        self.user_project_name = config.get('project_name')
+        self.current_version = config.get('current_version')
         self.docker_file_path = config.get('docker_file_path')
         self.stream_option = "STREAM_ON"
         self.stream_log = True
 
         self.docker_build = {
-            "gcp_project_name": self.GCP_PROJECT,
-            "source_bucket": self.BUCKET_NAME,
+            "gcp_project_name": cluster_config.gcp_project,
+            "source_bucket": cluster_config.source_bucket,
             "docker_image_name": self.user_project_name+"-"+self.current_version,
             "source_object": self.user_project_name+"/"+self.user_project_name+"-"+self.current_version+".tgz",
-            "log_bucket": self.LOG_BUCKET,
+            "log_bucket": cluster_config.cloudbuild_bucket,
         }
 
         self.kubernetes_build = {
-            "gcp_project_name": self.GCP_PROJECT,
-            "source_bucket": self.BUCKET_NAME,
+            "gcp_project_name": cluster_config.gcp_project,
+            "source_bucket": cluster_config.source_bucket,
             "source_object": self.user_project_name+"/"+"kubernetes"+"-"+self.user_project_name+"-"+self.current_version+".tgz",
-            "log_bucket": self.LOG_BUCKET,
-            "compute_zone": self.COMPUTE_ZONE,
-            "cluster_name": self.CLUSTER_NAME
+            "log_bucket": cluster_config.cloudbuild_bucket,
+            "compute_zone": cluster_config.compute_zone,
+            "cluster_name": cluster_config.cluster_name
         }
 
         if self.isLogTrailer():

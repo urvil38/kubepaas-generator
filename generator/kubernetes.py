@@ -6,12 +6,10 @@ from jinja2 import Template
 class KubernetesBuilder(object):
     MIN_REPLICAS = 2
     MAX_REPLICAS = 3
-    issuer_name = "letsencrypt-prod"
-    gcp_project = "kubepaas-261611"
     YAML_SEPARATOR = "\n---\n"
     KUBERNETES_TEMPLATE_PATH = "./templates/Kubernetes/"
 
-    def __init__(self, config):
+    def __init__(self, config, cluster_config):
         self.project_name = config.get('project_name')
         self.current_version = config.get('current_version')
 
@@ -19,6 +17,8 @@ class KubernetesBuilder(object):
         self.container_port = deploy.get('port')
         self.runtime = deploy.get('runtime')
         self.env = deploy.get('env')
+        self.issuer_name = cluster_config.issuer_name
+        self.gcp_project = cluster_config.gcp_project
 
         self.kubernetes = {
             "project_name": self.project_name,
@@ -29,7 +29,8 @@ class KubernetesBuilder(object):
             "runtime": self.runtime,
             "gcp_project": self.gcp_project,
             "date": datetime.datetime.now(),
-            "env": self.env
+            "env": self.env,
+            "dns_name": cluster_config.dns_name
         }
 
     def generateKubernetesResource(self, resourceType):
