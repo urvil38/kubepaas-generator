@@ -3,7 +3,8 @@
 
 FROM {{ config.docker_image }}
 WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /src/app
-EXPOSE {{ config.port }}
 CMD ["/src/app"]

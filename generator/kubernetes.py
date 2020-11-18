@@ -30,7 +30,8 @@ class KubernetesBuilder(object):
             "gcp_project": self.gcp_project,
             "date": datetime.datetime.now(),
             "env": self.env,
-            "dns_name": cluster_config.dns_name
+            "dns_name": cluster_config.dns_name,
+            "dns_ttl": cluster_config.dns_ttl
         }
 
     def generateKubernetesResource(self, resourceType):

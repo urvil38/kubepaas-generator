@@ -24,3 +24,4 @@ class Config:
     self.compute_zone = getEnv("COMPUTE_ZONE")
     self.cluster_name = getEnv("CLUSTER_NAME")
     self.dns_name = getEnv("DNS_NAME")
+    self.dns_ttl = getEnv("DNS_TTL", "60")

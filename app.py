@@ -88,7 +88,8 @@ def kubepaasConf(type=None):
             "source_bucket": cluster_config.source_bucket,
             "cloudbuild_bucket": cluster_config.cloudbuild_bucket,
             "cloudbuild_secret": cluster_config.build_secret,
-            "cloudstorage_secret": cluster_config.storage_secret
+            "cloudstorage_secret": cluster_config.storage_secret,
+            "domain_name": cluster_config.dns_name
         }
 
         response = app.response_class(

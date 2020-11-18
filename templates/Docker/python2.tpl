@@ -3,7 +3,7 @@
 
 FROM {{config.docker_image}}
 WORKDIR /app
-COPY . .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-EXPOSE {{config.port}}
+COPY . .
 CMD ["python","app.py"]

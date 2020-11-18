@@ -5,6 +5,7 @@ metadata:
   namespace: {{config.project_name}}
   annotations:
     kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/ttl: "{{config.dns_ttl}}"
 spec:
   tls:
     - hosts:
