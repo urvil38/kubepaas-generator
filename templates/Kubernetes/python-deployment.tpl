@@ -21,11 +21,26 @@ spec:
         app: {{config.project_name}}
     spec:
       containers:
+      - name: nginx
+        image: nginx:1.13.0
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/usr/sbin/nginx","-s","quit"]
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        volumeMounts:
+        - name: {{config.project_name}}-run
+          mountPath: /var/run/{{config.project_name}}
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+          readOnly: true
       - name: {{config.project_name}}
         imagePullPolicy: "Always"
         image: gcr.io/{{config.gcp_project}}/{{config.project_name}}-{{config.current_version}}:latest
-        ports:
-        - containerPort: {{config.container_port}}
+        workingDir: /app
+        command: ["/usr/local/bin/uwsgi"]
         {% if config.env is iterable and config.env|length > 0 %}
         env:
         {% for env in config.env %}
@@ -33,6 +48,12 @@ spec:
           value: {{ env.value }}
         {% endfor %}
         {% endif %}
+        args:
+          - "--die-on-term"
+          - "--manage-script-name"
+          - "--mount=/=app:app"
+          - "--socket=/var/run/{{config.project_name}}/uwsgi.sock"
+          - "--chmod-socket=666"
         {% if config.volumeMount is iterable and config.volumeMount|length > 0 %}
         volumeMounts:
         {% for mount in config.volumeMount %}
@@ -53,7 +74,7 @@ spec:
       - name: {{volume.configMap.name}}
         configMap:
           name: {{volume.configMap.mount.name}}
-          {% if volume.configMap.mount.items is iterable and volume.configMap.mount.items|length > 0 %}
+          {% if volume.configMap.mount.items is iterable %}
           items:
           {% for item in volume["configMap"]["mount"]["items"] %}
             - key: {{ item.key }}
