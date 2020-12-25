@@ -1,11 +1,11 @@
-import os
 import datetime
+
 from jinja2 import Template
 
 
 class KubernetesBuilder(object):
-    MIN_REPLICAS = 2
-    MAX_REPLICAS = 3
+    MIN_REPLICAS = 1
+    MAX_REPLICAS = 2
     YAML_SEPARATOR = "\n---\n"
     KUBERNETES_TEMPLATE_PATH = "./templates/Kubernetes/"
 
@@ -34,10 +34,9 @@ class KubernetesBuilder(object):
             "dns_ttl": cluster_config.dns_ttl
         }
 
-    def generateKubernetesResource(self, resourceType):
-        template = ""
-        with open(self.KUBERNETES_TEMPLATE_PATH+resourceType+".tpl") as tpl:
+    def generate_kubernetes_resource(self, resource_type):
+        with open(self.KUBERNETES_TEMPLATE_PATH + resource_type + ".tpl") as tpl:
             template = tpl.read()
 
-        jinjaTemplate = Template(template, trim_blocks=True, lstrip_blocks=True)
-        return jinjaTemplate.render(config=self.kubernetes)
+        jinja_template = Template(template, trim_blocks=True, lstrip_blocks=True)
+        return jinja_template.render(config=self.kubernetes)

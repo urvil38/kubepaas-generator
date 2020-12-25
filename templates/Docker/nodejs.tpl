@@ -3,7 +3,7 @@
 
 FROM {{ config.docker_image }}
 WORKDIR /app
-COPY package.json package-*.json .
+COPY package.json package-*.json ./
 RUN npm i --only=production
 COPY . .
 CMD [ "npm", "run","start" ]

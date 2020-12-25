@@ -45,7 +45,7 @@ class static_runtime(KubernetesBuilder):
         self.kubernetes["volumeMount"] = [
             {
                 "path": "/etc/nginx/nginx.conf",
-                "name": self.project_name+"-conf",
+                "name": self.project_name + "-conf",
                 "readonly": "true",
                 "subpath": "nginx.conf"
             },
@@ -57,9 +57,9 @@ class static_runtime(KubernetesBuilder):
         self.kubernetes["volumes"] = [
             {
                 "configMap": {
-                    "name": self.project_name+"-conf",
+                    "name": self.project_name + "-conf",
                     "mount": {
-                        "name": self.project_name+"-conf",
+                        "name": self.project_name + "-conf",
                         "items": [
                             {
                                 "key": "nginx.conf",
@@ -77,7 +77,7 @@ class static_runtime(KubernetesBuilder):
         ]
         for resource in ["namespace", "configmap", "service", "deployment", "ingress",
                          "networkpolicy"]:
-            kubernetesFile += self.generateKubernetesResource(resource)
+            kubernetesFile += self.generate_kubernetes_resource(resource)
             kubernetesFile += self.YAML_SEPARATOR
 
         return kubernetesFile

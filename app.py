@@ -1,33 +1,35 @@
-from flask import request, make_response, Flask, json, abort
-
-from generator.cloudbuild import Cloudbuilder
-from generator.docker import DockerFileBuilder
-from generator.kubernetes import KubernetesBuilder
-from runtime import Runtime
-from config import Config
-
 import json
+import os
+
+from flask import request, make_response, Flask, json, abort, Response
+
+from config import Config
+from generator.cloudbuild import CloudBuilder
+from generator.docker import DockerFileBuilder
+from kubelogger import KubeLogger
+from runtime import Runtime
 
 app = Flask(__name__)
 
 cluster_config = Config()
 
+
 @app.route('/dockerfile', methods=["POST"])
-def generateDockerfile():
+def generate_dockerfile():
     req = request.get_json(silent=True, force=True)
     config = req.get('deploy')
 
     builder = DockerFileBuilder(config)
-    outputText = builder.GenerateDockerFile()
-    if outputText == "":
+    output_text = builder.generate_docker_file()
+    if output_text == "":
         return make_response("", 404)
-    res = make_response(outputText)
+    res = make_response(output_text)
     res.mimetype = "text/plain"
     return res
 
 
 @app.route('/cloudbuild/t/docker', methods=["POST"])
-def generateCloudBuildForDocker():
+def generate_cloud_build_for_docker():
     req = request.get_json(silent=True, force=True)
     project_name = req.get('project_name')
     current_version = req.get('current_version')
@@ -40,15 +42,15 @@ def generateCloudBuildForDocker():
     if docker_file_path != "":
         config["docker_file_path"] = docker_file_path
 
-    builder = Cloudbuilder(config, cluster_config)
-    outputText = builder.GenerateBuildConfigForDocker()
-    res = make_response(outputText)
+    builder = CloudBuilder(config, cluster_config)
+    output_text = builder.generate_build_config_for_docker()
+    res = make_response(output_text)
     res.mimetype = "text/plain"
     return res
 
 
 @app.route('/cloudbuild/t/kubernetes', methods=["POST"])
-def generateCloudBuildForKubernetes():
+def generate_cloud_build_for_kubernetes():
     req = request.get_json(silent=True, force=True)
     project_name = req.get('project_name')
     current_version = req.get('current_version')
@@ -56,15 +58,15 @@ def generateCloudBuildForKubernetes():
         "project_name": project_name,
         "current_version": current_version
     }
-    builder = Cloudbuilder(config, cluster_config)
-    outputText = builder.GenerateBuildConfigForKubernetes()
-    res = make_response(outputText)
+    builder = CloudBuilder(config, cluster_config)
+    output_text = builder.generate_build_config_for_kubernetes()
+    res = make_response(output_text)
     res.mimetype = "text/plain"
     return res
 
 
 @app.route('/kubernetes', methods=["POST"])
-def generateKubernetesConfig():
+def generate_kubernetes_config():
     config = request.get_json(silent=True, force=True)
     runtime = Runtime(config, cluster_config)
     res = make_response(runtime.GenerateKubernetesFile())
@@ -72,17 +74,31 @@ def generateKubernetesConfig():
     return res
 
 
+@app.route('/logs/<name>', methods=["GET"])
+def get_logs(name=None):
+    config = {
+        'name': name,
+        'since': request.args.get('since'),
+        'tail': request.args.get('tail'),
+        'stream': request.args.get('stream')
+    }
+    logger = KubeLogger(config)
+    proc = logger.get_log()
+
+    return Response(proc, mimetype='text/plain')
+
+
 @app.route('/', methods=["GET"])
 def welcome():
     return "hello to kubepaas generation service"
 
+
 @app.route('/kubepaas/<type>', methods=["GET"])
-def kubepaasConf(type=None):
-    if type == None:
+def kubepaas_config(type=None):
+    if type is None:
         abort(404, description="request resource type was not found!")
 
     if str(type) == "config":
-
         conf = {
             "gcp_project": cluster_config.gcp_project,
             "source_bucket": cluster_config.source_bucket,
@@ -93,13 +109,13 @@ def kubepaasConf(type=None):
         }
 
         response = app.response_class(
-            response = json.dumps(conf),
-            mimetype = 'application/json'
+            response=json.dumps(conf),
+            mimetype='application/json'
         )
         return response
 
     return abort(404, description="Resource not found")
 
 
-if __name__ == "__main__":
+if os.environ.get("FLASK_ENV") != "production":
     app.run(host="0.0.0.0")

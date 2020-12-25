@@ -1,8 +1,9 @@
 import os
 
-def getEnv(name, default = ""):
-  value = os.environ.get(name)
-  if value == None:
-    return default
-  else:
-    return value
+
+def get_env(name, default=""):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    else:
+        return value

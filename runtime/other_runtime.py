@@ -1,15 +1,16 @@
 from generator.kubernetes import KubernetesBuilder
 
-class other_runtime(KubernetesBuilder):
+
+class OtherRuntime(KubernetesBuilder):
     def __init__(self, config, cluster_config):
         KubernetesBuilder.__init__(self, config, cluster_config)
 
-    def generateRuntimeResources(self):
-        kubernetesFile = ""
+    def generate_runtime_resources(self):
 
+        kubernetes_file = ""
         for resource in ["namespace", "configmap", "service", "deployment", "ingress",
                          "networkpolicy"]:
-            kubernetesFile += self.generateKubernetesResource(resource)
-            kubernetesFile += self.YAML_SEPARATOR
+            kubernetes_file += self.generate_kubernetes_resource(resource)
+            kubernetes_file += self.YAML_SEPARATOR
 
-        return kubernetesFile
+        return kubernetes_file
