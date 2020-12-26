@@ -1,5 +1,4 @@
 import json
-import os
 
 from flask import request, make_response, Flask, json, abort, Response
 
@@ -80,16 +79,18 @@ def get_logs(name=None):
         'name': name,
         'since': request.args.get('since'),
         'tail': request.args.get('tail'),
-        'stream': request.args.get('stream')
+        'stream': request.args.get('stream'),
+        'container_name': request.args.get('container_name')
     }
     logger = KubeLogger(config)
-    proc = logger.get_log()
+    read_line = logger.get_log()
 
-    return Response(proc, mimetype='text/plain')
+    return Response(read_line(), mimetype="text/event-stream")
 
 
 @app.route('/', methods=["GET"])
 def welcome():
+    print("hello to kubepaas generation service")
     return "hello to kubepaas generation service"
 
 
@@ -115,7 +116,3 @@ def kubepaas_config(type=None):
         return response
 
     return abort(404, description="Resource not found")
-
-
-if os.environ.get("FLASK_ENV") != "production":
-    app.run(host="0.0.0.0")

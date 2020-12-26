@@ -6,7 +6,6 @@ class OtherRuntime(KubernetesBuilder):
         KubernetesBuilder.__init__(self, config, cluster_config)
 
     def generate_runtime_resources(self):
-
         kubernetes_file = ""
         for resource in ["namespace", "configmap", "service", "deployment", "ingress",
                          "networkpolicy"]:
