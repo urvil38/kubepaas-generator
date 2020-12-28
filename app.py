@@ -84,13 +84,13 @@ def get_logs(name=None):
     }
     logger = KubeLogger(config)
     read_line = logger.get_log()
-
-    return Response(read_line(), mimetype="text/event-stream")
+    headers = logger.http_response_headers()
+    mime_type = logger.http_mime_type()
+    return Response(read_line(), mimetype=mime_type, headers=headers)
 
 
 @app.route('/', methods=["GET"])
 def welcome():
-    print("hello to kubepaas generation service")
     return "hello to kubepaas generation service"
 
 

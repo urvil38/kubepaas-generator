@@ -12,7 +12,7 @@ class KubeLogger:
         self.container_name = config.get('container_name')
 
     def get_log(self):
-        args = ["kubectl", "logs", "deployment/" + self.name, "-n", self.name]
+        args = ["kubectl", "logs", "deployment/" + self.name]
         if self.container_name is not None:
             args.extend(["-c", self.container_name])
         else:
@@ -26,7 +26,7 @@ class KubeLogger:
 
         def read_process():
             proc = subprocess.Popen(
-                ' '.join(args),
+                args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
@@ -59,3 +59,21 @@ class KubeLogger:
             print(f"process return code: {ret_code}")
 
         return read_process
+
+    def http_response_headers(self):
+        headers = {}
+
+        if self.stream:
+            # set following header on response header to stop nginx(use as reverse proxy) to buffer the response
+            # So, nginx will pass response to client Immediately without buffering. This will be important
+            # while streaming response (container logs).
+            # https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
+            headers['X-Accel-Buffering'] = 'no'
+
+        return headers
+
+    def http_mime_type(self):
+        if self.stream:
+            return 'text/event-stream'
+        else:
+            return 'text/plain'
