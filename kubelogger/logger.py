@@ -12,7 +12,7 @@ class KubeLogger:
         self.container_name = config.get('container_name')
 
     def get_log(self):
-        args = ["kubectl", "logs", "deployment/" + self.name]
+        args = ["kubectl", "logs", "deployment/" + self.name, "-n", self.name]
         if self.container_name is not None:
             args.extend(["-c", self.container_name])
         else:
