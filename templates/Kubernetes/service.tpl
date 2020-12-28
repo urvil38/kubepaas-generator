@@ -10,4 +10,4 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: {{config.container_port}}
-  type: NodePort
+  type: ClusterIP
