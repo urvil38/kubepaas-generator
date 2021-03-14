@@ -91,7 +91,7 @@ def get_logs(name=None):
 
 @app.route('/', methods=["GET"])
 def welcome():
-    return "hello to kubepaas generation service"
+    return "Welcome to kubepaas generator service"
 
 
 @app.route('/kubepaas/<type>', methods=["GET"])

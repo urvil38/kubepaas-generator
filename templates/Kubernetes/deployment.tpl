@@ -29,8 +29,8 @@ spec:
         {% if config.env is iterable and config.env|length > 0 %}
         env:
         {% for env in config.env %}
-        - name: {{ env.name }}
-          value: {{ env.value }}
+        - name: "{{ env.name }}"
+          value: "{{ env.value }}"
         {% endfor %}
         {% endif %}
         {% if config.volumeMount is iterable and config.volumeMount|length > 0 %}

@@ -1,0 +1,7 @@
+apiVersion: kubepaas/v1beta
+kind: config
+metadata:
+  name: "generator"
+  version: "v1.0.0"
+deploy:
+  runtime: "python3"
